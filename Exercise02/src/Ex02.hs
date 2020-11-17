@@ -65,87 +65,35 @@ eval d (Var x) = find d x
 -- eval d (Add (Val x)(Val y))  = case (eval d x, eval d y) of (Right x, Right y) -> Right ( x + y) _ -> Left  "undefined var x"
 
 
-eval d (Add (Val x)(Val y)) = Right ( x + y)
+eval d (Add x y) = case eval d x of
+                    Left error -> Left error
+                    Right a -> 
+                      case eval d y of
+                        Left error -> Left error
+                        Right b -> Right (a + b)
 
-eval ((s,v):ds) (Add (Var x) (Val y)) | x == s = eval ds (Add (Val v) (Val y))
-                                      | otherwise = eval ds (Add (Var x) (Val y))
+eval d (Mul x y) = case eval d x of
+                    Left error -> Left error
+                    Right a -> 
+                      case eval d y of
+                        Left error -> Left error
+                        Right b -> Right (a * b)
 
+eval d (Dvd x y) = case eval d x of
+                    Left error -> Left error
+                    Right a -> 
+                      case eval d y of
+                        Left error -> Left error
+                        Right 0.0 -> Left "div by zero"
+                        Right b -> Right (a / b)
 
-eval ((s,v):ds) (Add (Val x) (Var y)) | y == s = eval ds (Add (Val x) (Val v))
-                                      | otherwise = eval ds (Add (Val x) (Var y)) 
-                                    
-                              
+eval d (Sub x y) = case eval d x of
+                    Left error -> Left error
+                    Right a -> 
+                      case eval d y of
+                        Left error -> Left error
+                        Right b -> Right (a - b)
 
-eval ((s,v):ds) (Add (Var x) (Var y)) | x == s = eval ds (Add (Val v) (Var y))
-                                      | y == s = eval ds (Add (Var x) (Val v))
-                                      | otherwise = eval ds (Add (Var x) (Var y))
-
--- eval d (Dvd _ (Val 0.0)) = Left "div by zero"
-
-
- eval d (Add _ (Dvd _ (Val 0.0))) = Left "div by zero"
--- eval d (Add _ _) = Left "undefined var y"
-eval d (Add _ _) = Left "undefined var x"
-
-
-eval d (Sub (Val x)(Val y)) = Right ( x - y)
-
-eval ((s,v):ds) (Sub (Var x) (Val y)) | x == s = eval ds (Sub (Val v) (Val y))
-                                      | otherwise = eval ds (Sub (Var x) (Val y))
-
-eval ((s,v):ds) (Sub (Val x) (Var y)) | y == s = eval ds (Sub (Val x) (Val v))
-                                      | otherwise = eval ds (Sub (Val x) (Var y))
-
-eval ((s,v):ds) (Sub (Var x) (Var y)) | x == s = eval ds (Sub (Val v) (Var y))
-                                      | y == s = eval ds (Sub (Var x) (Val v))
-                                      | otherwise = eval ds (Sub (Var x) (Var y))
-
-eval d (Sub _ _) = Left "div by zero"
-
-
-
-eval d (Mul (Val x)(Val y)) = Right ( x * y)
-
-eval ((s,v):ds) (Mul (Var x) (Val y)) | x == s = eval ds (Mul (Val v) (Val y))
-                                      | otherwise = eval ds (Mul (Var x) (Val y))
-
-eval ((s,v):ds) (Mul (Val x) (Var y)) | y == s = eval ds (Mul (Val x) (Val v))
-                                      | otherwise = eval ds (Mul (Val x) (Var y))
-
-eval ((s,v):ds) (Mul (Var x) (Var y)) | x == s = eval ds (Mul (Val v) (Var y))
-                                      | y == s = eval ds (Mul (Var x) (Val v))
-                                      | otherwise = eval ds (Mul (Var x) (Var y))
-
-eval d (Mul _ _) = Left "div by zero"
-
-
-
-eval d (Dvd (Val x)(Val y)) = Right ( x / y)
-eval d (Dvd _ (Val 0.0)) = Left "div by zero"
-
-
-eval ((s,v):ds) (Dvd (Var x) (Val y)) | x == s = eval ds (Dvd (Val v) (Val y))
-                                      | otherwise = eval ds (Dvd (Var x) (Val y))
-
-eval ((s,v):ds) (Dvd (Val x) (Var y)) | y == s = eval ds (Dvd (Val x) (Val v))
-                                      | otherwise = eval ds (Dvd (Val x) (Var y))
-
-eval ((s,v):ds) (Dvd (Var x) (Var y)) | x == s = eval ds (Dvd (Val v) (Var y))
-                                      | y == s = eval ds (Dvd (Var x) (Val v))
-                                      | otherwise = eval ds (Dvd (Var x) (Var y))
-
-eval d (Dvd _ _) = Left "div by zero"
-
-
-
-{--
-eval d (Def var x y ) = case eval d x of 
-	Left"div by zero" -> Left"div by zero"
-	Right k -> eval (define d var k) y 
-	--}
-eval d (Def x (Val y) e2) = eval (define d x y) e2
-
-eval d (Def _ _ _) = Left "div by zero"
 --eval d (Def _ _ _) = Left "undefined var x"
 
 -- Part 1 : Expression Laws -- (15 test marks, worth 15 Exercise Marks) --------
