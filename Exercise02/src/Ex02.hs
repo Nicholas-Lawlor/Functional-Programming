@@ -2,7 +2,7 @@
 module Ex02 where
 
 name, idno, username :: String
-name      =  "Myself, Me"  -- replace with your name
+name      =  "Nick, Me"  -- replace with your name
 idno      =  "01234567"    -- replace with your student id
 username  =  "memyselfi"   -- replace with your TCD username
 
